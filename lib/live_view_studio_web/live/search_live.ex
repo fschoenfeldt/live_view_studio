@@ -95,7 +95,7 @@ defmodule LiveViewStudioWeb.SearchLive do
 
       stores ->
         socket = assign(socket, stores: stores, loading: false)
-        {:noreply, socket}
+        {:noreply, socket, temporary_assigns: [stores: []]}
     end
   end
 end
