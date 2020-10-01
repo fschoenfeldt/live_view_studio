@@ -18,6 +18,7 @@ module.exports = {
       ],
     },
   },
+  important: true,
   variants: {
     //backgroundColor: ["responsive", "hover", "focus", "active"]
   },

@@ -12,6 +12,7 @@
 
 alias LiveViewStudio.Repo
 alias LiveViewStudio.Boats.Boat
+alias LiveViewStudio.Photos.Photo
 
 %Boat{
   model: "1760 Retriever Jon Deluxe",
@@ -244,5 +245,41 @@ alias LiveViewStudio.Stores.Store
   zip: "22527",
   open: true,
   hours: "8am - 4am M-S"
+}
+|> Repo.insert!()
+
+%Photo{
+  title: "Test-Foto Nummer 1",
+  description: "Eine wunderbare Heiterkeit hat meine ganze Seele eingenommen, gleich den süßen Frühlingsmorgen, die ich mit ganzem Herzen genieße. Ich bin allein und freue mich meines Lebens in dieser Gegend, die für solche Seelen geschaffen ist wie die meine. Ich bin so glücklich, mein Bester, so ganz in dem Gefühle von ruhigem Dasein versunken, daß meine Kunst darunter leidet.",
+  url: "/images/photos/frederik-schonfeldt--QTa5xYxDCs-unsplash.jpg",
+  date: "2020-10-01T06:13:06+00:00",
+  user: "fred"
+}
+|> Repo.insert!()
+
+%Photo{
+  title: "Test-Foto Nummer 2",
+  description: "Ich bin allein und freue mich meines Lebens in dieser Gegend, die für solche Seelen geschaffen ist wie die meine. Ich bin so glücklich, mein Bester, so ganz in dem Gefühle von ruhigem Dasein versunken, daß meine Kunst darunter leidet.",
+  url: "/images/photos/frederik-schonfeldt-vSnK92lYckw-unsplash.jpg",
+  date: "2020-09-01T06:13:06+00:00",
+  user: "fred"
+}
+|> Repo.insert!()
+
+%Photo{
+  title: "Test-Foto Nummer 3",
+  description: "Eine wunderbare Heiterkeit hat meine ganze Seele eingenommen, gleich den süßen Frühlingsmorgen, die ich mit ganzem Herzen genieße. Ich bin allein und freue mich meines Lebens in dieser Gegend, die für solche Seelen geschaffen ist wie die meine.",
+  url: "/images/photos/frederik-schonfeldt-TXjhVlbQBEc-unsplash.jpg",
+  date: "2020-08-01T06:13:06+00:00",
+  user: "john"
+}
+|> Repo.insert!()
+
+%Photo{
+  title: "Test-Foto Nummer 4",
+  description: "Eine wunderbare Heiterkeit hat meine ganze Seele eingenommen, gleich den süßen Frühlingsmorgen, die ich mit ganzem Herzen genieße. Ich bin allein und freue mich meines Lebens in dieser Gegend, die für solche Seelen geschaffen ist wie die meine. Ich bin so glücklich, mein Bester, so ganz in dem Gefühle von ruhigem Dasein versunken, daß meine Kunst darunter leidet.",
+  url: "/images/photos/frederik-schonfeldt-3YSQgKNLFuE-unsplash.jpg",
+  date: "2020-07-01T06:13:06+00:00",
+  user: "john"
 }
 |> Repo.insert!()
