@@ -30,9 +30,24 @@ defmodule LiveViewStudio.Photos do
 
       {:user, user}, query ->
         fuzzy_user = "%#{user}%"
+
         from(q in query,
           where: ilike(q.user, ^fuzzy_user)
         )
+
+      # !TODO: make title search work
+      {:title, ""}, query ->
+        query
+
+      {:title, title}, query ->
+        fuzzy_title = "%#{title}%"
+
+        from(q in query,
+          where: ilike(q.title, ^fuzzy_title)
+        )
+
+      _, query ->
+        query
     end)
     |> Repo.all()
 
