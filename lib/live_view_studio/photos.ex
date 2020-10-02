@@ -23,6 +23,7 @@ defmodule LiveViewStudio.Photos do
 
   def list_photos(criteria) when is_list(criteria) do
     query = from(p in Photo)
+    IO.inspect(criteria, label: "got criteria")
 
     Enum.reduce(criteria, query, fn
       {:user, ""}, query ->
@@ -35,7 +36,6 @@ defmodule LiveViewStudio.Photos do
           where: ilike(q.user, ^fuzzy_user)
         )
 
-      # !TODO: make title search work
       {:title, ""}, query ->
         query
 

@@ -23,10 +23,10 @@ defmodule LiveViewStudioWeb.PhotosLive do
       <h1 class="text-5xl">Fotohäcker on Elixir!</h1>
       <!-- Filter Navigation Bar -->
       <div class="p-4 mb-4 bg-gray-100 rounded-lg shadow-md">
-        <form class="flex gap-2 flex-col md:flex-row items-center" phx-submit="filter" phx-change="filter">
+        <form class="grid grid-cols-2 gap-2 flex-col md:flex md:flex-row items-center" phx-submit="filter" phx-change="filter">
           <input phx-debounce="250" class="p-2 rounded border-2" id="title" name="title" type="text" placeholder="filter by title" value="<%= @filter.title %>">
           <input phx-debounce="250" class="p-2 rounded border-2" id="user" name="user" type="text" placeholder="filter by username" value="<%= @filter.user %>">
-          <fieldset class="bg-gray-200 rounded">
+          <fieldset class="bg-gray-200 rounded flex items-center justify-between">
             <input phx-click="grid_change" class="btn btn-darker rounded-r-none" type="button" name="-" value="-" />
             <span class="p-2">Zoom</span>
             <input phx-click="grid_change" class="btn btn-darker rounded-l-none" type="button" name="+" value="+" />
@@ -39,8 +39,8 @@ defmodule LiveViewStudioWeb.PhotosLive do
           </fieldset>
           <%# <input class="p-2 rounded border-2" id="user" name="user" type="text" placeholder="search by title" value="">
           <input class="p-2 rounded border-2" id="user" name="user" type="text" placeholder="search by date" value=""> %>
-
-          <input class="btn btn-green md:ml-auto" type="submit">
+          <button class="btn md:ml-auto">❌</button>
+          <input class="btn btn-green" type="submit">
         </form>
       </div>
       <!--/ Filter Navigation Bar -->
@@ -81,21 +81,12 @@ defmodule LiveViewStudioWeb.PhotosLive do
     """
   end
 
-  def handle_event("filter", %{"user" => user}, socket) do
+  def handle_event("filter", %{"user" => user, "title" => title}, socket) do
+    IO.inspect([title, user], label: "title, user")
     socket =
       assign(socket,
-        filter: Map.replace!(socket.assigns.filter, :user, user),
-        photos: Photos.list_photos(user: user)
-      )
-
-    {:noreply, socket}
-  end
-
-  def handle_event("filter", %{"title" => title}, socket) do
-    socket =
-      assign(socket,
-        filter: Map.replace!(socket.assigns.filter, :title, title),
-        photos: Photos.list_photos(title: title)
+        filter: Map.merge(socket.assigns.filter, %{user: user, title: title}),
+        photos: Photos.list_photos([user: user, title: title])
       )
 
     {:noreply, socket}
