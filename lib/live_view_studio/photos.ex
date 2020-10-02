@@ -46,12 +46,16 @@ defmodule LiveViewStudio.Photos do
           where: ilike(q.title, ^fuzzy_title)
         )
 
+      {:categories, []}, query ->
+          query
+
+      {:categories, categories}, query ->
+        from q in query, where: fragment("? && ?", q.categories, ^categories)
+
       _, query ->
         query
     end)
     |> Repo.all()
-
-    # Repo.get_by!(Photo, [title: "Mein Titel"])
   end
 
   @doc """

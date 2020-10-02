@@ -2,15 +2,19 @@ defmodule LiveViewStudioWeb.PhotosLive do
   use LiveViewStudioWeb, :live_view
   alias LiveViewStudio.Photos
 
-  def categories() do
+  defp categories() do
     ["nature", "architecture", "bw"]
+  end
+
+  defp filter_default() do
+    %{user: "", title: "", categories: []}
   end
 
   def mount(_params, _session, socket) do
     socket =
       assign(socket,
         photos: Photos.list_photos(),
-        filter: %{user: "", title: "", categories: []},
+        filter: filter_default(),
         grid: %{columns: 3, increase_enabled: true, decrease_enabled: true}
       )
 
@@ -31,17 +35,17 @@ defmodule LiveViewStudioWeb.PhotosLive do
             <span class="p-2">Zoom</span>
             <input phx-click="grid_change" class="btn btn-darker rounded-l-none" type="button" name="+" value="+" />
           </fieldset>
-          <fieldset>
-              <input type="hidden" name="categories[]" value="" />
+          <fieldset class="flex justify-between">
+              <input type="hidden" name="category_checkbox[]" value="" />
               <%= for category <- categories() do %>
-                <%= category_checkbox(category: category) %>
+                <%= category_checkbox(category: category, checked: category in @filter.categories) %>
               <% end %>
           </fieldset>
           <%# <input class="p-2 rounded border-2" id="user" name="user" type="text" placeholder="search by title" value="">
           <input class="p-2 rounded border-2" id="user" name="user" type="text" placeholder="search by date" value=""> %>
-          <button class="btn md:ml-auto">❌</button>
           <input class="btn btn-green" type="submit">
         </form>
+        <button phx-click="clear_filter" class="btn md:ml-auto">❌</button>
       </div>
       <!--/ Filter Navigation Bar -->
 
@@ -49,9 +53,9 @@ defmodule LiveViewStudioWeb.PhotosLive do
           <p class="text-center text-2xl mt-4">🤷🏻 No results found</p>
       <% end %>
       <!-- Photo Grid -->
-      <div class="grid grid-cols-<%= grid_columns(@grid.columns, 'sm') %> md:grid-cols-<%= grid_columns(@grid.columns, 'md') %> lg:grid-cols-<%= grid_columns(@grid.columns, 'lg') %> gap-4 max-w-xxl mx-auto mb-4">
+      <div class="grid grid-cols-<%= grid_columns(@grid.columns, 'sm') %> md:grid-cols-<%= grid_columns(@grid.columns, 'md') %> lg:grid-cols-<%= grid_columns(@grid.columns, 'lg') %> gap-6 max-w-xxl mx-auto mb-4">
         <%= for photo <- @photos do %>
-          <div class="transition duration-75 ease-in-out bg-white rounded-lg overflow-hidden hover:opacity-75 shadow-md">
+          <div class="transition duration-75 ease-in-out bg-white rounded-lg overflow-hidden shadow-md hover:shadow-2xl">
             <div>
               <%= img_tag(photo.url, class: "w-full") %>
             </div>
@@ -76,17 +80,20 @@ defmodule LiveViewStudioWeb.PhotosLive do
     assigns = Enum.into(assigns, %{})
 
     ~L"""
-      <input type="checkbox" id="categories_checkbox-<%= assigns.category %>" name="category_checkbox[]" value="<%= assigns.category %>">
-      <label for="categories_checkbox-<%= assigns.category %>"><%= assigns.category %></label>
+      <%# <span> %>
+        <input class="p-2" type="checkbox" <%= if @checked, do: "checked" %> id="categories_checkbox-<%= assigns.category %>" name="category_checkbox[]" value="<%= assigns.category %>">
+        <label class="p-2" for="categories_checkbox-<%= assigns.category %>"><%= assigns.category %></label>
+      <%# </span> %>
     """
   end
 
-  def handle_event("filter", %{"user" => user, "title" => title}, socket) do
-    IO.inspect([title, user], label: "title, user")
+  def handle_event("filter", %{"user" => user, "title" => title, "category_checkbox" => categories}, socket) do
+    categories = List.delete_at(categories, 0)
+    IO.inspect([title, user, categories], label: "title, user, categories")
     socket =
       assign(socket,
-        filter: Map.merge(socket.assigns.filter, %{user: user, title: title}),
-        photos: Photos.list_photos([user: user, title: title])
+        filter: Map.merge(socket.assigns.filter, %{user: user, title: title, categories: categories}),
+        photos: Photos.list_photos([user: user, title: title, categories: categories])
       )
 
     {:noreply, socket}
@@ -107,6 +114,12 @@ defmodule LiveViewStudioWeb.PhotosLive do
         grid: Map.replace!(socket.assigns.grid, :columns, socket.assigns.grid.columns + 1)
       )
 
+    {:noreply, socket}
+  end
+
+  def handle_event("clear_filter", _, socket) do
+    IO.write("clear!")
+    socket = assign(socket, filter: filter_default(), photos: Photos.list_photos())
     {:noreply, socket}
   end
 
