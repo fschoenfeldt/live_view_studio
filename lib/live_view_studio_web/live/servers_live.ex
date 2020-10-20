@@ -32,6 +32,21 @@ defmodule LiveViewStudioWeb.ServersLive do
   end
 
   def handle_params(_, _url, socket) do
+    if socket.assigns.live_action == :new do
+      socket = assign(
+        socket,
+        changeset: Servers.change_server(%Server{})
+      )
+      IO.inspect(socket.assigns.changeset, label: "changeset")
+      {:noreply, socket}
+    else
+      {:noreply, socket}
+    end
+  end
+
+  def handle_event("submit", %{"server" => params}, socket) do
+    IO.inspect(params, label: "submitted server")
+    # socket = assign(socket, key: value)
     {:noreply, socket}
   end
 

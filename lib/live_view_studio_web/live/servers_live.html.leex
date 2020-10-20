@@ -20,47 +20,76 @@
   </div>
   <div class="main">
     <div class="wrapper">
+      <%= if @live_action == :new do %>
+        <%= f = form_for @changeset, "#",
+          phx_submit: "submit" %>
+        <div class="field">
+          <%= text_input f,
+              :name,
+              placeholder: "Name",
+              autocomplete: "off"
+            %>
+        </div>
+        <div class="field">
+          <%= text_input f,
+              :framework,
+              placeholder: "Framework",
+              autocomplete: "off"
+            %>
+        </div>
+        <div class="field">
+          <%= text_input f,
+              :size,
+              placeholder: "Size",
+              autocomplete: "off"
+            %>
+        </div>
+        <div class="field">
+          <%= text_input f,
+              :git_repo,
+              placeholder: "Git Repo",
+              autocomplete: "off"
+            %>
+        </div>
+        <%= submit "Save", phx_disable_with: "Saving..." %>
+      </form>
+    <% else %>
       <div class="card">
-        <%= if @live_action == :new do %>
-        <%#= f = form_for @changeset, "#" %>
-
-        </form>
-        <% else %>
-          <div class="header">
-            <h2><%= @selected_server.name %></h2>
-            <span class="<%= @selected_server.status %>">
-              <%= @selected_server.status %>
+        <div class="header">
+          <h2><%= @selected_server.name %></h2>
+          <span class="<%= @selected_server.status %>">
+            <%= @selected_server.status %>
+          </span>
+        </div>
+        <div class="body">
+          <div class="row">
+            <div class="deploys">
+              <img src="/images/deploy.svg">
+              <span>
+                <%= @selected_server.deploy_count %> deploys
+              </span>
+            </div>
+            <span>
+              <%= @selected_server.size %> MB
+            </span>
+            <span>
+              <%= @selected_server.framework %>
             </span>
           </div>
-          <div class="body">
-            <div class="row">
-              <div class="deploys">
-                <img src="/images/deploy.svg">
-                <span>
-                  <%= @selected_server.deploy_count %> deploys
-                </span>
-              </div>
-              <span>
-                <%= @selected_server.size %> MB
-              </span>
-              <span>
-                <%= @selected_server.framework %>
-              </span>
-            </div>
-            <h3>Git Repo</h3>
-            <div class="repo">
-              <%= @selected_server.git_repo %>
-            </div>
-            <h3>Last Commit</h3>
-            <div class="commit">
-              <%= @selected_server.last_commit_id %>
-            </div>
-            <blockquote>
-              <%= @selected_server.last_commit_message %>
-            </blockquote>
+          <h3>Git Repo</h3>
+          <div class="repo">
+            <%= @selected_server.git_repo %>
           </div>
-        <% end %>
-      </div>
+          <h3>Last Commit</h3>
+          <div class="commit">
+            <%= @selected_server.last_commit_id %>
+          </div>
+          <blockquote>
+            <%= @selected_server.last_commit_message %>
+          </blockquote>
+        </div>
+      <% end %>
     </div>
   </div>
+</div>
 </div>
