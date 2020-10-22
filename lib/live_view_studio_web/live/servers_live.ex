@@ -46,8 +46,26 @@ defmodule LiveViewStudioWeb.ServersLive do
 
   def handle_event("submit", %{"server" => params}, socket) do
     IO.inspect(params, label: "submitted server")
-    # socket = assign(socket, key: value)
-    {:noreply, socket}
+
+    case Servers.create_server(params) do
+      {:ok, server} ->
+        IO.inspect(server, label: "WORKED!")
+        socket = assign(
+          socket,
+          servers: [server | socket.assigns.servers]
+        )
+        {:noreply, push_patch(
+          socket,
+          to: Routes.live_path(socket, __MODULE__, id: server.id)
+        )}
+      {:error, %Ecto.Changeset{} = changeset} ->
+        IO.inspect(changeset, label: "Didn't work!")
+        socket = assign(
+          socket,
+          changeset: changeset
+        )
+        {:noreply, socket}
+    end
   end
 
   defp link_body(server) do

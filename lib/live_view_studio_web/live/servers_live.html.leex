@@ -29,6 +29,7 @@
               placeholder: "Name",
               autocomplete: "off"
             %>
+            <%= error_tag f, :name %>
         </div>
         <div class="field">
           <%= text_input f,
@@ -36,6 +37,7 @@
               placeholder: "Framework",
               autocomplete: "off"
             %>
+            <%= error_tag f, :framework %>
         </div>
         <div class="field">
           <%= text_input f,
@@ -43,6 +45,7 @@
               placeholder: "Size",
               autocomplete: "off"
             %>
+          <%= error_tag f, :size %>
         </div>
         <div class="field">
           <%= text_input f,
@@ -50,8 +53,14 @@
               placeholder: "Git Repo",
               autocomplete: "off"
             %>
+          <%= error_tag f, :git_repo %>
         </div>
         <%= submit "Save", phx_disable_with: "Saving..." %>
+        <%= live_patch(
+          "Cancel",
+          to: Routes.live_path(@socket, __MODULE__),
+          class: ""
+        ) %>
       </form>
     <% else %>
       <div class="card">
