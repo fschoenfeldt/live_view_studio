@@ -78,6 +78,16 @@ defmodule LiveViewStudioWeb.ServersLive do
     end
   end
 
+  def handle_event("validate", %{"server" => params}, socket) do
+    changeset =
+      %Server{}
+      |> Servers.change_server(params)
+      |> Map.put(:action, :insert)
+
+    socket = assign(socket, changeset: changeset)
+    {:noreply, socket}
+  end
+
   defp link_body(server) do
     assigns = %{name: server.name, status: server.status}
 
