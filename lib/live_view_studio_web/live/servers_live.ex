@@ -33,10 +33,12 @@ defmodule LiveViewStudioWeb.ServersLive do
 
   def handle_params(_, _url, socket) do
     if socket.assigns.live_action == :new do
-      socket = assign(
-        socket,
-        changeset: Servers.change_server(%Server{})
-      )
+      socket =
+        assign(
+          socket,
+          changeset: Servers.change_server(%Server{})
+        )
+
       IO.inspect(socket.assigns.changeset, label: "changeset")
       {:noreply, socket}
     else
@@ -50,20 +52,28 @@ defmodule LiveViewStudioWeb.ServersLive do
     case Servers.create_server(params) do
       {:ok, server} ->
         IO.inspect(server, label: "WORKED!")
-        socket = assign(
-          socket,
-          servers: [server | socket.assigns.servers]
-        )
-        {:noreply, push_patch(
-          socket,
-          to: Routes.live_path(socket, __MODULE__, id: server.id)
-        )}
+
+        socket =
+          assign(
+            socket,
+            servers: [server | socket.assigns.servers]
+          )
+
+        {:noreply,
+         push_patch(
+           socket,
+           to: Routes.live_path(socket, __MODULE__, id: server.id)
+         )}
+
       {:error, %Ecto.Changeset{} = changeset} ->
         IO.inspect(changeset, label: "Didn't work!")
-        socket = assign(
-          socket,
-          changeset: changeset
-        )
+
+        socket =
+          assign(
+            socket,
+            changeset: changeset
+          )
+
         {:noreply, socket}
     end
   end
