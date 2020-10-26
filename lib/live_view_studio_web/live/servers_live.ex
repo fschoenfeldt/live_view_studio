@@ -2,6 +2,8 @@ defmodule LiveViewStudioWeb.ServersLive do
   use LiveViewStudioWeb, :live_view
 
   alias LiveViewStudio.Servers
+  alias LiveViewStudio.Servers.Server
+  # alias LiveViewStudioWeb.Router
 
   def mount(_params, _session, socket) do
     servers = Servers.list_servers()
@@ -30,76 +32,95 @@ defmodule LiveViewStudioWeb.ServersLive do
   end
 
   def handle_params(_, _url, socket) do
+    if socket.assigns.live_action == :new do
+      socket =
+        assign(
+          socket,
+          changeset: Servers.change_server(%Server{})
+        )
+
+      IO.inspect(socket.assigns.changeset, label: "changeset")
+      {:noreply, socket}
+    else
+      {:noreply, socket}
+    end
+  end
+
+  def handle_event("submit", %{"server" => params}, socket) do
+    IO.inspect(params, label: "submitted server")
+
+    case Servers.create_server(params) do
+      {:ok, server} ->
+        IO.inspect(server, label: "WORKED!")
+
+        socket =
+          assign(
+            socket,
+            servers: [server | socket.assigns.servers]
+          )
+
+        {:noreply,
+         push_patch(
+           socket,
+           to: Routes.live_path(socket, __MODULE__, id: server.id)
+         )}
+
+      {:error, %Ecto.Changeset{} = changeset} ->
+        IO.inspect(changeset, label: "Didn't work!")
+
+        socket =
+          assign(
+            socket,
+            changeset: changeset
+          )
+
+        {:noreply, socket}
+    end
+  end
+
+  def handle_event("validate", %{"server" => params}, socket) do
+    changeset =
+      %Server{}
+      |> Servers.change_server(params)
+      |> Map.put(:action, :insert)
+
+    socket = assign(socket, changeset: changeset)
     {:noreply, socket}
   end
 
-  def render(assigns) do
-    ~L"""
-    <h1>Servers</h1>
-    <div id="servers">
-      <div class="sidebar">
-        <nav>
-          <%= for server <- @servers do %>
-            <div>
-              <%= live_patch link_body(server),
-                    to: Routes.live_path(
-                              @socket,
-                              __MODULE__,
-                              id: server.id
-                        ),
-                    class: if server == @selected_server, do: "active" %>
-            </div>
+  def handle_event("toggle", %{"id" => id}, socket) do
+    server = Servers.get_server!(id)
 
-          <% end %>
-        </nav>
-      </div>
-      <div class="main">
-        <div class="wrapper">
-          <div class="card">
-            <div class="header">
-              <h2><%= @selected_server.name %></h2>
-              <span class="<%= @selected_server.status %>">
-                <%= @selected_server.status %>
-              </span>
-            </div>
-            <div class="body">
-              <div class="row">
-                <div class="deploys">
-                  <img src="/images/deploy.svg">
-                  <span>
-                    <%= @selected_server.deploy_count %> deploys
-                  </span>
-                </div>
-                <span>
-                  <%= @selected_server.size %> MB
-                </span>
-                <span>
-                  <%= @selected_server.framework %>
-                </span>
-              </div>
-              <h3>Git Repo</h3>
-              <div class="repo">
-                <%= @selected_server.git_repo %>
-              </div>
-              <h3>Last Commit</h3>
-              <div class="commit">
-                <%= @selected_server.last_commit_id %>
-              </div>
-              <blockquote>
-                <%= @selected_server.last_commit_message %>
-              </blockquote>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    """
+    {:ok, server} =
+      Servers.update_server(server, %{
+        status: if(server.status == "down", do: "up", else: "down")
+      })
+
+    socket =
+      update(socket, :servers, fn servers ->
+        for s <- servers do
+          case s.id == id do
+            true -> server
+            _ -> s
+          end
+        end
+      end)
+
+    socket =
+      assign(
+        socket,
+        selected_server: server
+      )
+
+    :timer.sleep(500)
+    {:noreply, socket}
   end
 
   defp link_body(server) do
-    assigns = %{name: server.name}
+    assigns = %{name: server.name, status: server.status}
 
     ~L"""
+    <span class="status <%= @status %>"></span>
     <img src="/images/server.svg">
     <%= @name %>
     """
