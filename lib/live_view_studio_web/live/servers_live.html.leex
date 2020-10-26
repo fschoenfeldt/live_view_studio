@@ -13,7 +13,7 @@
                               __MODULE__,
                               id: server.id
                         ),
-                    class: if server == @selected_server, do: "active" %>
+                    class: if server.id == @selected_server.id, do: "active" %>
         </div>
       <% end %>
     </nav>
@@ -71,9 +71,12 @@
       <div class="card">
         <div class="header">
           <h2><%= @selected_server.name %></h2>
-          <span class="<%= @selected_server.status %>">
+          <button class="<%= @selected_server.status %>"
+          phx-click="toggle"
+          phx-value-id="<%= @selected_server.id %>"
+          phx-disable-with="Saving...">
             <%= @selected_server.status %>
-          </span>
+          </button>
         </div>
         <div class="body">
           <div class="row">

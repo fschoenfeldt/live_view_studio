@@ -88,6 +88,40 @@ defmodule LiveViewStudioWeb.ServersLive do
     {:noreply, socket}
   end
 
+  def handle_event("toggle", %{"id" => id}, socket) do
+    #IO.inspect id, label: "selected server"
+    server = Servers.get_server!(id)
+    #IO.inspect selected_server, label: "db_server"
+
+    {:ok, server} = Servers.update_server(server, %{
+      status: if(server.status == "down", do: "up", else: "down")
+    })
+
+    IO.inspect server, label: "new server"
+
+    socket = assign(
+      socket,
+      selected_server: server
+    )
+
+    #IO.inspect socket.assigns.servers, label: "All Servers"
+
+    # servers = Servers.list_servers()
+
+    socket =
+      update(socket, :servers, fn servers ->
+        for s <- servers do
+          case s.id == id do
+            true -> server
+            _ -> s
+          end
+        end
+      end)
+
+    :timer.sleep(500)
+    {:noreply, socket}
+  end
+
   defp link_body(server) do
     assigns = %{name: server.name, status: server.status}
 
