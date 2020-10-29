@@ -1,4 +1,6 @@
 import flatpickr from "flatpickr";
+import { AsYouType } from "libphonenumber-js";
+
 let Hooks = {};
 
 Hooks.InfiniteScroll = {
@@ -38,6 +40,18 @@ Hooks.DatePicker = {
     console.log(`${selectedDates}, ${dateStr}`, instance);
     this.pushEvent("date_changed", { date: dateStr });
   },
+};
+
+Hooks.PhoneNumber = {
+  mounted() {
+    const { el:phoneInput } = this;
+    phoneInput.addEventListener("change", (event) => {
+        const formattedNumber = new AsYouType('US').input(event.target.value)
+        console.log(formattedNumber)
+        event.target.value = formattedNumber;
+    })
+  },
+  updated() {},
 };
 
 export default Hooks;
