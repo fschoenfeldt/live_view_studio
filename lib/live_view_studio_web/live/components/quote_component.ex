@@ -14,11 +14,11 @@ defmodule LiveViewStudioWeb.QuoteComponent do
 
   def render(assigns) do
     ~L"""
-    <div class="text-center p-6 border-4 border-dashed border-indigo-600">
+    <div class="text-center p-6 border-4 border-dashed border-<%= if @color, do: @color, else: 'gray' %>-600">
       <h2 class="text-2xl mb-2">
         Our Best Deal:
       </h2>
-      <h3 class="text-xl font-semibold text-indigo-600">
+      <h3 class="text-xl font-semibold text-<%= if @color, do: @color, else: 'gray' %>-600">
         <%= @weight %> pounds of <%= @material %>
         for <%= number_to_currency(@price) %>
       </h3>
