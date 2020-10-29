@@ -1,4 +1,5 @@
 defmodule LiveViewStudio.Servers do
+  @topic inspect __MODULE__
   @moduledoc """
   The Servers context.
   """
@@ -71,7 +72,29 @@ defmodule LiveViewStudio.Servers do
     server
     |> Server.changeset(attrs)
     |> Repo.update()
+    |> broadcast(:server_updated)
   end
+
+  def subscribe do
+    Phoenix.PubSub.subscribe(
+      LiveViewStudio.PubSub,
+      @topic
+    )
+  end
+
+  def broadcast({:ok, server}, event) do
+    IO.inspect {:ok, server}, label: "broadcasting server"
+
+    Phoenix.PubSub.broadcast(
+      LiveViewStudio.PubSub,
+      @topic,
+      {event, server}
+    )
+
+    {:ok, server}
+  end
+
+  def broadcast({:error, _reason} = error, _event), do: error
 
   @doc """
   Deletes a server.

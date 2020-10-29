@@ -6,6 +6,8 @@ defmodule LiveViewStudioWeb.ServersLive do
   # alias LiveViewStudioWeb.Router
 
   def mount(_params, _session, socket) do
+    if connected?(socket), do: Servers.subscribe()
+
     servers = Servers.list_servers()
 
     socket =
@@ -91,20 +93,9 @@ defmodule LiveViewStudioWeb.ServersLive do
   def handle_event("toggle", %{"id" => id}, socket) do
     server = Servers.get_server!(id)
 
-    {:ok, server} =
-      Servers.update_server(server, %{
-        status: if(server.status == "down", do: "up", else: "down")
-      })
-
-    socket =
-      update(socket, :servers, fn servers ->
-        for s <- servers do
-          case s.id == id do
-            true -> server
-            _ -> s
-          end
-        end
-      end)
+    {:ok, _server} = Servers.update_server(server, %{
+      status: if(server.status == "down", do: "up", else: "down")
+    })
 
     socket =
       assign(
@@ -112,7 +103,21 @@ defmodule LiveViewStudioWeb.ServersLive do
         selected_server: server
       )
 
-    :timer.sleep(500)
+    # :timer.sleep(500)
+    {:noreply, socket}
+  end
+
+  def handle_info({:server_updated, server}, socket) do
+    socket =
+      update(socket, :servers, fn servers ->
+        for s <- servers do
+          case s.id == server.id do
+            true -> server
+            _ -> s
+          end
+        end
+      end)
+
     {:noreply, socket}
   end
 
