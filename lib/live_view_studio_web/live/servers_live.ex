@@ -55,12 +55,6 @@ defmodule LiveViewStudioWeb.ServersLive do
       {:ok, server} ->
         IO.inspect(server, label: "WORKED!")
 
-        socket =
-          assign(
-            socket,
-            servers: [server | socket.assigns.servers]
-          )
-
         {:noreply,
          push_patch(
            socket,
@@ -93,9 +87,10 @@ defmodule LiveViewStudioWeb.ServersLive do
   def handle_event("toggle", %{"id" => id}, socket) do
     server = Servers.get_server!(id)
 
-    {:ok, _server} = Servers.update_server(server, %{
-      status: if(server.status == "down", do: "up", else: "down")
-    })
+    {:ok, _server} =
+      Servers.update_server(server, %{
+        status: if(server.status == "down", do: "up", else: "down")
+      })
 
     socket =
       assign(
@@ -108,6 +103,7 @@ defmodule LiveViewStudioWeb.ServersLive do
   end
 
   def handle_info({:server_updated, server}, socket) do
+    # update servers
     socket =
       update(socket, :servers, fn servers ->
         for s <- servers do
@@ -117,6 +113,23 @@ defmodule LiveViewStudioWeb.ServersLive do
           end
         end
       end)
+
+    # update selected_server if it's currently selected
+    socket =
+      assign(
+        socket,
+        selected_server: if(server.id == socket.assigns.selected_server.id, do: server, else: socket.assigns.selected_server)
+      )
+
+    {:noreply, socket}
+  end
+
+  def handle_info({:server_added, server}, socket) do
+    socket =
+      assign(
+        socket,
+        servers: [server | socket.assigns.servers]
+      )
 
     {:noreply, socket}
   end

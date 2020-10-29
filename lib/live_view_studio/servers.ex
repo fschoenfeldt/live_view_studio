@@ -54,6 +54,7 @@ defmodule LiveViewStudio.Servers do
     %Server{}
     |> Server.changeset(attrs)
     |> Repo.insert()
+    |> broadcast(:server_added)
   end
 
   @doc """
