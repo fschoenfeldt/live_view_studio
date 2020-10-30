@@ -20,7 +20,7 @@ defmodule LiveViewStudioWeb.QuoteComponent do
       </h2>
       <h3 class="text-xl font-semibold text-<%= if @color, do: @color, else: 'gray' %>-600">
         <%= @weight %> pounds of <%= @material %>
-        for <%= number_to_currency(@price) %>
+        for <%= number_to_currency(@price) %><%= if(@delivery_charge, do: ", plus #{number_to_currency(@delivery_charge)}") %>
       </h3>
       <div class="text-gray-600">
         expires in <%= @hrs_until_expires %> hours
